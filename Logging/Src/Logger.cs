@@ -46,9 +46,9 @@ namespace Lockstep.Logging {
         
         static StringBuilder _logBuffer = new StringBuilder(); 
         public static void DefaultServerLogHandler(object sernder, LogEventArgs logArgs){
-            //if ((LogSeverity.Error & logArgs.LogSeverity) != 0
-            //    || (LogSeverity.Exception & logArgs.LogSeverity) != 0
-            if(true) {
+            if ((LogSeverity.Error & logArgs.LogSeverity) != 0
+                || (LogSeverity.Exception & logArgs.LogSeverity) != 0
+            ) {
                 StackTrace st = new StackTrace(true);
                 StackFrame[] sf = st.GetFrames();
                 for (int i = 4; i < sf.Length; ++i) {

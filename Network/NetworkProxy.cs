@@ -1,4 +1,3 @@
-using Lockstep.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,8 +76,15 @@ namespace Lockstep.Network {
 
         private readonly Dictionary<long, Session> sessions = new Dictionary<long, Session>();
 
+        /// <summary>
+        /// 解析具体是哪条协议的
+        /// </summary>
         public IMessagePacker MessagePacker { get; set; }
 
+        /// <summary>
+        /// 在客户端是Client，在服务器是Server
+        /// TODO 感觉这么传给NetProxy真的好吗？
+        /// </summary>
         public IMessageDispatcher MessageDispatcher { get; set; }
 
         public void Awake(NetworkProtocol protocol){
@@ -108,15 +114,12 @@ namespace Lockstep.Network {
             }
         }
 
-		/// <summary>
-		/// 在未dispose之前，一直await等待客户端连接
-		/// </summary>
-		private async void StartAccept(){
+        private async void StartAccept(){
             while (true) {
-				Debug.Log("StartAccept  " + this.IsDisposed + "  " + this.Id);
-				if (this.IsDisposed) {
+                if (this.IsDisposed) {
                     return;
                 }
+
                 await this.Accept();
             }
         }

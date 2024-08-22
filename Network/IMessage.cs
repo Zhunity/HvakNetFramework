@@ -2,6 +2,10 @@ namespace Lockstep.Network {
     public interface IMessage {
          ushort opcode { get; set; }
     }
+
+    /// <summary>
+    /// √ª”√£ø 
+    /// </summary>
     public interface IRequest : IMessage {
         int RpcId { get; set; }
     }
