@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace Lockstep.Network
 {
-	public sealed class TService: AService
+	public sealed class TcpService: AService
 	{
 		private TcpListener acceptor;
 
-		private readonly Dictionary<long, TChannel> idChannels = new Dictionary<long, TChannel>();
+		private readonly Dictionary<long, TcpChannel> idChannels = new Dictionary<long, TcpChannel>();
 		
 		/// <summary>
 		/// 即可做client也可做server
 		/// </summary>
-		public TService(IPEndPoint ipEndPoint)
+		public TcpService(IPEndPoint ipEndPoint)
 		{
 			this.acceptor = new TcpListener(ipEndPoint);
 			this.acceptor.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -24,7 +24,7 @@ namespace Lockstep.Network
 			this.acceptor.Start();
 		}
 
-		public TService()
+		public TcpService()
 		{
 		}
 
@@ -37,7 +37,7 @@ namespace Lockstep.Network
 
 			foreach (long id in this.idChannels.Keys.ToArray())
 			{
-				TChannel channel = this.idChannels[id];
+				TcpChannel channel = this.idChannels[id];
 				channel.Dispose();
 			}
 			this.acceptor.Stop();
@@ -46,7 +46,7 @@ namespace Lockstep.Network
 		
 		public override AChannel GetChannel(long id)
 		{
-			TChannel channel = null;
+			TcpChannel channel = null;
 			this.idChannels.TryGetValue(id, out channel);
 			return channel;
 		}
@@ -58,7 +58,7 @@ namespace Lockstep.Network
 				throw new Exception("service construct must use host and port param");
 			}
 			TcpClient tcpClient = await this.acceptor.AcceptTcpClientAsync();
-			TChannel channel = new TChannel(tcpClient, this);
+			TcpChannel channel = new TcpChannel(tcpClient, this);
 			this.idChannels[channel.Id] = channel;
 			return channel;
 		}
@@ -66,7 +66,7 @@ namespace Lockstep.Network
 		public override AChannel ConnectChannel(IPEndPoint ipEndPoint)
 		{
 			TcpClient tcpClient = new TcpClient();
-			TChannel channel = new TChannel(tcpClient, ipEndPoint, this);
+			TcpChannel channel = new TcpChannel(tcpClient, ipEndPoint, this);
 			this.idChannels[channel.Id] = channel;
 
 			return channel;
@@ -75,7 +75,7 @@ namespace Lockstep.Network
 
 		public override void Remove(long id)
 		{
-			TChannel channel;
+			TcpChannel channel;
 			if (!this.idChannels.TryGetValue(id, out channel))
 			{
 				return;

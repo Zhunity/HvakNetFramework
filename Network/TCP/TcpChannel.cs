@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Lockstep.Network
 {
-	public class TChannel : AChannel {
+	public class TcpChannel : AChannel {
 		private readonly TcpClient tcpClient;
 
 		private readonly CircularBuffer recvBuffer = new CircularBuffer();
@@ -22,7 +22,7 @@ namespace Lockstep.Network
 		/// <summary>
 		/// connect
 		/// </summary>
-		public TChannel(TcpClient tcpClient, IPEndPoint ipEndPoint, TService service) : base(service, ChannelType.Connect)
+		public TcpChannel(TcpClient tcpClient, IPEndPoint ipEndPoint, TcpService service) : base(service, ChannelType.Connect)
 		{
 			this.tcpClient = tcpClient;
 			this.parser = new PacketParser(this.recvBuffer);
@@ -34,7 +34,7 @@ namespace Lockstep.Network
 		/// <summary>
 		/// accept
 		/// </summary>
-		public TChannel(TcpClient tcpClient, TService service) : base(service, ChannelType.Accept)
+		public TcpChannel(TcpClient tcpClient, TcpService service) : base(service, ChannelType.Accept)
 		{
 			this.tcpClient = tcpClient;
 			this.parser = new PacketParser(this.recvBuffer);

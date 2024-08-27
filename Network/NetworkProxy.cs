@@ -90,7 +90,7 @@ namespace Lockstep.Network {
         public void Awake(NetworkProtocol protocol){
             switch (protocol) {
                 case NetworkProtocol.TCP:
-                    this.Service = new TService();
+                    this.Service = new TcpService();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -101,7 +101,7 @@ namespace Lockstep.Network {
             try {
                 switch (protocol) {
                     case NetworkProtocol.TCP:
-                        this.Service = new TService(ipEndPoint);
+                        this.Service = new TcpService(ipEndPoint);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

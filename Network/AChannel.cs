@@ -32,6 +32,9 @@ namespace Lockstep.Network {
         }
     }
 
+    /// <summary>
+    /// 用来区分TCP UDP
+    /// </summary>
     public abstract class AChannel : NetBase {
         public ChannelType ChannelType { get; }
 
