@@ -92,11 +92,13 @@ namespace Lockstep.Network {
         /// </summary>
         /// <param name="protocol"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public void Awake(NetworkProtocol protocol){
+        public void StartAsClient(NetworkProtocol protocol){
             switch (protocol) {
                 case NetworkProtocol.TCP:
                     this.Service = new TcpService();
-                    break;
+                    this.Service.StartAsClient();
+
+					break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -109,11 +111,12 @@ namespace Lockstep.Network {
         /// <param name="ipEndPoint"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="Exception"></exception>
-        public void Awake(NetworkProtocol protocol, IPEndPoint ipEndPoint){
+        public void StartAsServer(NetworkProtocol protocol, IPEndPoint ipEndPoint){
             try {
                 switch (protocol) {
                     case NetworkProtocol.TCP:
-                        this.Service = new TcpService(ipEndPoint);
+                        this.Service = new TcpService();
+                        this.Service.StartAsServer(ipEndPoint);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

@@ -13,22 +13,20 @@ namespace Lockstep.Network
 
 		private readonly Dictionary<long, TcpChannel> idChannels = new Dictionary<long, TcpChannel>();
 		
-		/// <summary>
-		/// 当作服务端启动？
-		/// </summary>
-		public TcpService(IPEndPoint ipEndPoint)
+		public TcpService()
+		{
+		}
+
+		public override void StartAsClient()
+		{
+		}
+
+		public override void StartAsServer(IPEndPoint ipEndPoint)
 		{
 			this.acceptor = new TcpListener(ipEndPoint);
 			this.acceptor.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 			this.acceptor.Server.NoDelay = true;
 			this.acceptor.Start();
-		}
-
-		/// <summary>
-		/// 当作客户端启动？
-		/// </summary>
-		public TcpService()
-		{
 		}
 
 		public override void Dispose()

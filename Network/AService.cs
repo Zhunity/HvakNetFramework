@@ -10,6 +10,7 @@ namespace Lockstep.Network
 	public enum NetworkProtocol
 	{
 		TCP,
+		UDP, // TODO
 	}
 
 	/// <summary>
@@ -18,6 +19,10 @@ namespace Lockstep.Network
 	/// </summary>
 	public abstract class AService :NetBase
 	{
+		public abstract void StartAsClient();
+
+		public abstract void StartAsServer(IPEndPoint ipEndPoint);
+
 		public abstract AChannel GetChannel(long id);
 
 		public abstract Task<AChannel> AcceptChannel();

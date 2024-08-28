@@ -51,10 +51,8 @@ namespace Lockstep.Network
 			try
 			{
 				await this.tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port);
-				
-				this.isConnected = true;
-				this.StartSend();
-				this.StartRecv();
+
+				this.OnAccepted();
 			}
 			catch (SocketException e)
 			{
