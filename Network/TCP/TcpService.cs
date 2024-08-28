@@ -14,7 +14,7 @@ namespace Lockstep.Network
 		private readonly Dictionary<long, TcpChannel> idChannels = new Dictionary<long, TcpChannel>();
 		
 		/// <summary>
-		/// 即可做client也可做server
+		/// 当作服务端启动？
 		/// </summary>
 		public TcpService(IPEndPoint ipEndPoint)
 		{
@@ -24,6 +24,9 @@ namespace Lockstep.Network
 			this.acceptor.Start();
 		}
 
+		/// <summary>
+		/// 当作客户端启动？
+		/// </summary>
 		public TcpService()
 		{
 		}
@@ -51,18 +54,30 @@ namespace Lockstep.Network
 			return channel;
 		}
 
+		/// <summary>
+		/// 服务器调用，监听客户端连接
+		/// </summary>
+		/// <returns></returns>
+		/// <exception cref="Exception"></exception>
 		public override async Task<AChannel> AcceptChannel()
 		{
 			if (this.acceptor == null)
 			{
 				throw new Exception("service construct must use host and port param");
 			}
+			// https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.tcplistener.accepttcpclientasync?view=net-8.0
+			// https://learn.microsoft.com/zh-cn/dotnet/fundamentals/networking/sockets/tcp-classes?redirectedfrom=MSDN
 			TcpClient tcpClient = await this.acceptor.AcceptTcpClientAsync();
 			TcpChannel channel = new TcpChannel(tcpClient, this);
 			this.idChannels[channel.Id] = channel;
 			return channel;
 		}
 
+		/// <summary>
+		/// 连接到服务端
+		/// </summary>
+		/// <param name="ipEndPoint"></param>
+		/// <returns></returns>
 		public override AChannel ConnectChannel(IPEndPoint ipEndPoint)
 		{
 			TcpClient tcpClient = new TcpClient();

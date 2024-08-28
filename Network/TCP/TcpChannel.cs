@@ -21,6 +21,7 @@ namespace Lockstep.Network
 
 		/// <summary>
 		/// connect
+		/// 客户端连接服务器成功
 		/// </summary>
 		public TcpChannel(TcpClient tcpClient, IPEndPoint ipEndPoint, TcpService service) : base(service, ChannelType.Connect)
 		{
@@ -33,6 +34,7 @@ namespace Lockstep.Network
 
 		/// <summary>
 		/// accept
+		/// 服务器等待客户端连接成功
 		/// </summary>
 		public TcpChannel(TcpClient tcpClient, TcpService service) : base(service, ChannelType.Accept)
 		{

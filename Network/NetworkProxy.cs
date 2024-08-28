@@ -87,6 +87,11 @@ namespace Lockstep.Network {
         /// </summary>
         public IMessageDispatcher MessageDispatcher { get; set; }
 
+        /// <summary>
+        /// 当作客户端启动？
+        /// </summary>
+        /// <param name="protocol"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public void Awake(NetworkProtocol protocol){
             switch (protocol) {
                 case NetworkProtocol.TCP:
@@ -97,6 +102,13 @@ namespace Lockstep.Network {
             }
         }
 
+        /// <summary>
+        /// 当作服务端启动？
+        /// </summary>
+        /// <param name="protocol"></param>
+        /// <param name="ipEndPoint"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="Exception"></exception>
         public void Awake(NetworkProtocol protocol, IPEndPoint ipEndPoint){
             try {
                 switch (protocol) {
