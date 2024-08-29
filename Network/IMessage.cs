@@ -1,5 +1,8 @@
 namespace Lockstep.Network {
-    public interface IMessage {
+	/// <summary>
+	/// TODO IBaseMsg和IMessage有什么区别
+	/// </summary>
+	public interface IMessage {
          ushort opcode { get; set; }
     }
 

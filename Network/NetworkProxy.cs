@@ -1,3 +1,4 @@
+using NetMsg.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,34 +41,37 @@ namespace Lockstep.Network {
         }
     }
 
-    public class NetInnerProxy : NetworkProxy {
-        public readonly Dictionary<IPEndPoint, Session> adressSessions = new Dictionary<IPEndPoint, Session>();
+    /// <summary>
+    /// 先屏蔽一下，不要看
+    /// </summary>
+    //public class NetInnerProxy : NetworkProxy {
+    //    public readonly Dictionary<IPEndPoint, Session> adressSessions = new Dictionary<IPEndPoint, Session>();
 
-        public override void Remove(long id){
-            Session session = this.Get(id);
-            if (session == null) {
-                return;
-            }
+    //    public override void Remove(long id){
+    //        Session session = this.Get(id);
+    //        if (session == null) {
+    //            return;
+    //        }
 
-            this.adressSessions.Remove(session.RemoteAddress);
+    //        this.adressSessions.Remove(session.RemoteAddress);
 
-            base.Remove(id);
-        }
+    //        base.Remove(id);
+    //    }
 
-        /// <summary>
-        /// 从地址缓存中取Session,如果没有则创建一个新的Session,并且保存到地址缓存中
-        /// </summary>
-        public Session Get(IPEndPoint ipEndPoint){
-            if (this.adressSessions.TryGetValue(ipEndPoint, out Session session)) {
-                return session;
-            }
+    //    /// <summary>
+    //    /// 从地址缓存中取Session,如果没有则创建一个新的Session,并且保存到地址缓存中
+    //    /// </summary>
+    //    public Session Get(IPEndPoint ipEndPoint){
+    //        if (this.adressSessions.TryGetValue(ipEndPoint, out Session session)) {
+    //            return session;
+    //        }
 
-            session = this.Create(ipEndPoint);
+    //        session = this.Create(ipEndPoint);
 
-            this.adressSessions.Add(ipEndPoint, session);
-            return session;
-        }
-    }
+    //        this.adressSessions.Add(ipEndPoint, session);
+    //        return session;
+    //    }
+    //}
 
     public class NetOuterProxy : NetworkProxy { }
 
@@ -219,7 +223,7 @@ namespace Lockstep.Network {
         private readonly List<byte[]> byteses = new List<byte[]>() {new byte[1], new byte[0], new byte[0]};
 
         public NetworkProxy Network;
-        public object BindInfo;
+        public object BindInfo; // 服务器绑定Player
 
         public T GetBindInfo<T>() where T : class{
             return BindInfo as T;
@@ -231,6 +235,9 @@ namespace Lockstep.Network {
             this.requestCallback.Clear();
         }
 
+        /// <summary>
+        /// TODO session不应该只是个登录标记吗？为什么还要处理消息
+        /// </summary>
         public void Start(){
             this.StartRecv();
         }
@@ -299,22 +306,23 @@ namespace Lockstep.Network {
             byte flag = packet.Flag();
             ushort opcode = packet.Opcode();
 
+			object message =
+				this.Network.MessagePacker.DeserializeFrom(opcode, packet.Bytes, Packet.Index,
+					packet.Length - Packet.Index);
+
 #if !SERVER
-            if (OpcodeHelper.IsClientHotfixMessage(opcode)) {
-                this.Network.MessageDispatcher.Dispatch(this, packet);
+			if (OpcodeHelper.IsClientHotfixMessage(opcode)) {
+                this.Network.MessageDispatcher.Dispatch(this, opcode, message as BaseMsg);
                 return;
             }
 #endif
 
             // flag第一位为1表示这是rpc返回消息,否则交由MessageDispatcher分发
             if ((flag & 0x01) == 0) {
-                this.Network.MessageDispatcher.Dispatch(this, packet);
+                this.Network.MessageDispatcher.Dispatch(this, opcode, message as BaseMsg);
                 return;
             }
-
-            object message =
-                this.Network.MessagePacker.DeserializeFrom(opcode, packet.Bytes, Packet.Index,
-                    packet.Length - Packet.Index);
+            
 
             IResponse response = message as IResponse;
             if (response == null) {

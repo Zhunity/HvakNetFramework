@@ -3,7 +3,10 @@ using Lockstep.Serialization;
 
 namespace NetMsg.Common {
 
-    public interface IBaseMsg { }
+	/// <summary>
+	/// TODO IBaseMsg和IMessage有什么区别
+	/// </summary>
+	public interface IBaseMsg { }
     [System.Serializable]
     [SelfImplement]
     public partial class BaseMsg : BaseFormater ,IBaseMsg{}
