@@ -21,7 +21,10 @@ namespace Lockstep.Network {
     public class NetBase : IDisposable {
         public long Id;
         public bool IsDisposed;
-        public virtual void Dispose(){ }
+        public virtual void Dispose()
+        {
+			IsDisposed = true;
+		}
     }
 
     public class IdGenerater {
@@ -36,7 +39,7 @@ namespace Lockstep.Network {
     /// 用来区分TCP UDP
     /// </summary>
     public abstract class AChannel : NetBase {
-        public ChannelType ChannelType { get; }
+        public ChannelType ChannelType { get; private set; }
 
         protected AService service;
 
@@ -58,7 +61,7 @@ namespace Lockstep.Network {
         }
 
 
-        protected AChannel(AService service, ChannelType channelType){
+        protected void Start(AService service, ChannelType channelType){
             this.Id = IdGenerater.GenerateId();
             this.ChannelType = channelType;
             this.service = service;

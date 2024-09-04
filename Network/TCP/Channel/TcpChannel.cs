@@ -9,62 +9,15 @@ using System.Threading.Tasks;
 namespace Lockstep.Network
 {
 	public class TcpChannel : AChannel {
-		private readonly TcpClient tcpClient;
+		protected TcpClient tcpClient;
 
-		private readonly CircularBuffer recvBuffer = new CircularBuffer();
-		private readonly CircularBuffer sendBuffer = new CircularBuffer();
+		protected readonly CircularBuffer recvBuffer = new CircularBuffer();
+		protected readonly CircularBuffer sendBuffer = new CircularBuffer();
 
 		private bool isSending;
-		private readonly PacketParser parser;
+		protected PacketParser parser;
 		private bool isConnected;
 		private TaskCompletionSource<Packet> recvTcs;
-
-		/// <summary>
-		/// connect
-		/// 客户端连接服务器成功
-		/// </summary>
-		public TcpChannel(TcpClient tcpClient, IPEndPoint ipEndPoint, TcpService service) : base(service, ChannelType.Connect)
-		{
-			this.tcpClient = tcpClient;
-			this.parser = new PacketParser(this.recvBuffer);
-			this.RemoteAddress = ipEndPoint;
-
-			this.ConnectAsync(ipEndPoint);
-		}
-
-		/// <summary>
-		/// accept
-		/// 服务器等待客户端连接成功
-		/// </summary>
-		public TcpChannel(TcpClient tcpClient, TcpService service) : base(service, ChannelType.Accept)
-		{
-			this.tcpClient = tcpClient;
-			this.parser = new PacketParser(this.recvBuffer);
-
-			IPEndPoint ipEndPoint = (IPEndPoint)this.tcpClient.Client.RemoteEndPoint;
-			this.RemoteAddress = ipEndPoint;
-			this.OnAccepted();
-		}
-
-		private async void ConnectAsync(IPEndPoint ipEndPoint)
-		{
-			try
-			{
-				await this.tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port);
-
-				this.OnAccepted();
-			}
-			catch (SocketException e)
-			{
-				Log.Error($"connect error: {e.SocketErrorCode}");
-				this.OnError(e.SocketErrorCode);
-			}
-			catch (Exception e)
-			{
-				this.OnError(SocketError.SocketError);
-				Log.Error($"connect error: {ipEndPoint} {e}");
-			}
-		}
 
 		public override void Dispose()
 		{
@@ -78,7 +31,7 @@ namespace Lockstep.Network
 			this.tcpClient.Close();
 		}
 
-		private void OnAccepted()
+		protected void OnAccepted()
 		{
 			this.isConnected = true;
 			this.StartSend();
@@ -245,6 +198,63 @@ namespace Lockstep.Network
 
 			recvTcs = new TaskCompletionSource<Packet>();
 			return recvTcs.Task;
+		}
+	}
+
+	public class TcpAcceptChannel : TcpChannel
+	{
+		/// <summary>
+		/// accept
+		/// 服务器等待客户端连接成功
+		/// </summary>
+		public void Start(TcpClient tcpClient, TcpService service)
+		{
+			this.Start(service, ChannelType.Accept);
+			this.tcpClient = tcpClient;
+			this.parser = new PacketParser(this.recvBuffer);
+
+			IPEndPoint ipEndPoint = (IPEndPoint)this.tcpClient.Client.RemoteEndPoint;
+			this.RemoteAddress = ipEndPoint;
+			this.OnAccepted();
+		}
+	}
+
+	public class TcpConnectChannel : TcpChannel
+	{
+		/// <summary>
+		/// connect
+		/// 客户端连接服务器成功
+		/// </summary>
+		public void Start(TcpClient tcpClient, IPEndPoint ipEndPoint, TcpService service)
+		{
+			this.Start(service, ChannelType.Connect);
+			this.tcpClient = tcpClient;
+			this.parser = new PacketParser(this.recvBuffer);
+			this.RemoteAddress = ipEndPoint;
+
+			this.ConnectAsync(ipEndPoint);
+		}
+
+
+
+		private async void ConnectAsync(IPEndPoint ipEndPoint)
+		{
+			try
+			{
+				await this.tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port);
+
+				this.OnAccepted();
+			}
+			catch (SocketException e)
+			{
+				Log.Error($"connect error: {e.SocketErrorCode}");
+				this.OnError(e.SocketErrorCode);
+			}
+			catch (Exception e)
+			{
+				this.OnError(SocketError.SocketError);
+				Log.Error($"connect error: {ipEndPoint} {e}");
+			}
 		}
 	}
 }

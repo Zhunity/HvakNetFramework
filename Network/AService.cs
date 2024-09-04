@@ -13,24 +13,31 @@ namespace Lockstep.Network
 		UDP, // TODO
 	}
 
+
 	/// <summary>
 	/// TCPService， UDPService的父类？
-	/// TODO 这个是啥，有什么用
 	/// </summary>
-	public abstract class AService :NetBase
+	public abstract class AService : NetBase
 	{
-		public abstract void StartAsClient();
-
-		public abstract void StartAsServer(IPEndPoint ipEndPoint);
-
+	
 		public abstract AChannel GetChannel(long id);
-
-		public abstract Task<AChannel> AcceptChannel();
-
-		public abstract AChannel ConnectChannel(IPEndPoint ipEndPoint);
 
 		public abstract void Remove(long channelId);
 
 		public abstract void Update();
+	}
+
+	public interface IAcceptService
+	{
+		public void StartAsServer(IPEndPoint ipEndPoint);
+
+		public Task<AChannel> AcceptChannel();
+	}
+
+	public interface IConnectService
+	{
+		public void StartAsClient();
+
+		public AChannel ConnectChannel(IPEndPoint ipEndPoint);
 	}
 }

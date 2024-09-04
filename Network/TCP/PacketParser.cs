@@ -44,7 +44,7 @@ namespace Lockstep.Network
 		}
 	}
 
-	internal class PacketParser
+	public class PacketParser
 	{
 		private readonly CircularBuffer buffer;
 
