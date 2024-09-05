@@ -3,6 +3,9 @@ using System.IO;
 using Lockstep.Util;
 
 namespace Lockstep.Game {
+    /// <summary>
+    /// TODO 看起来没什么卵用
+    /// </summary>
     public class ResService : BaseService, IResService {
         private Dictionary<ushort, string> _id2Path = new Dictionary<ushort, string>();
         public override void DoStart(){

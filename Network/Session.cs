@@ -1,4 +1,5 @@
-﻿using Lockstep.Network;
+﻿using Lockstep.Logging;
+using Lockstep.Network;
 using NetMsg.Common;
 using System;
 using System.Collections.Generic;
@@ -242,7 +243,8 @@ namespace Lockstep.Network
 		{
 			if (this.IsDisposed)
 			{
-				throw new Exception("session已经被Dispose了");
+				Debug.LogError("session已经被Dispose了");
+				return;
 			}
 
 			this.byteses[0][0] = flag;
